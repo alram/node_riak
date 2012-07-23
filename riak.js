@@ -190,6 +190,7 @@ function parse_multipart(res, str) {
 //     retry: <bool>   // default = true, will retry gets with exponential backoff when recieving a 404
 //     parse: <bool>   // default = true, will parse riak response assuming it is json
 //     resolver: <fn>  // no default = used to resolve sibling values
+//     keys: <true|false|stream> // no default. used to list all keys in a bucket
 // }
 function RiakRequest(client, bucket, key, options, callback) {
     var self = this;
@@ -274,7 +275,6 @@ RiakRequest.prototype.do_request = function () {
         headers: this.client.headers(this.options.http_headers),
         retry_not_found: this.should_retry
     };
-    console.log(pool_options.path);
 
     if (this.debug_mode) {
         this.client.log("riak request", "pool options: " + JSON.stringify(pool_options));
