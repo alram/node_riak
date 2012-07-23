@@ -282,7 +282,6 @@ RiakRequest.prototype.do_request = function () {
       //bucket is bucket
       pool_options.path = "/buckets/" + encodeURIComponent(this.bucket) + "/index/" + this.key + qs;
     }
-    console.log(pool_options.path);
 
     if (this.debug_mode) {
         this.client.log("riak request", "pool options: " + JSON.stringify(pool_options));
