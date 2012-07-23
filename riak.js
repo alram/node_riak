@@ -191,6 +191,7 @@ function parse_multipart(res, str) {
 //     parse: <bool>   // default = true, will parse riak response assuming it is json
 //     resolver: <fn>  // no default = used to resolve sibling values
 //     keys: <true|false|stream> // no default. used to list all keys in a bucket
+//     i2: <bool>     // (GET only) default to false. Say the request is a i2 search. key become "<indexname/indexnumber>"
 // }
 function RiakRequest(client, bucket, key, options, callback) {
     var self = this;
@@ -208,6 +209,7 @@ function RiakRequest(client, bucket, key, options, callback) {
     this.method = this.options.method;
     this.r_val = this.options.r_val || null;
     this.keys = this.options.keys || null;
+    this.i2 = this.options.i2 || false;
     this.return_body = this.options.return_body || null;
     this.should_parse = this.options.parse !== false;
     this.should_retry = this.options.retry !== false;
@@ -275,6 +277,12 @@ RiakRequest.prototype.do_request = function () {
         headers: this.client.headers(this.options.http_headers),
         retry_not_found: this.should_retry
     };
+
+    if (this.i2) {
+      //bucket is bucket
+      pool_options.path = "/buckets/" + encodeURIComponent(this.bucket) + "/index/" + this.key + qs;
+    }
+    console.log(pool_options.path);
 
     if (this.debug_mode) {
         this.client.log("riak request", "pool options: " + JSON.stringify(pool_options));
@@ -651,3 +659,4 @@ RiakClient.prototype.solr = function (bucket, query, limit, callback) {
 };
 
 module.exports = RiakClient;
+
