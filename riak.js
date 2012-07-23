@@ -194,6 +194,11 @@ function parse_multipart(res, str) {
 function RiakRequest(client, bucket, key, options, callback) {
     var self = this;
 
+    // Options is not set
+    if (typeof(options) === 'function') {
+      callback = options;
+    }
+
     this.client = client;
     this.bucket = bucket;
     this.key = key;
