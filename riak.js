@@ -575,44 +575,17 @@ RiakClient.prototype.del = function (bucket, key, callback) {
     }, callback);
 };
 
-RiakClient.prototype.post = function (url, post_body, callback) {
-    if (this.debug_mode) {
-        this.log("riak post", url + ", " + post_body);
-    }
+RiakClient.prototype.post = function (bucket, key, message, options, callback) {
+    var http_headers = this.headers(options.http_headers),
+        out_body;
 
-    if (typeof callback !== "function") {
-        throw new Error("Callback passed non-function");
-    }
+    http_headers["Content-Type"] = http_headers["Content-Type"] || "application/json";
+    options.http_headers = http_headers;
+    options.method = "post";
+    options.body = message;
 
-    var self = this;
+    return new RiakRequest(this, bucket, key, options, callback);
 
-    this.pool.post({
-        path: url,
-        headers: {
-            "X-Riak-ClientId": this.client_id,
-            "Connection": "keep-alive",
-            "Content-Type": "application/json"
-        }
-    }, post_body, function (err, res, body) {
-        var obj = {};
-        if (err) {
-            self.error("riak post err", inspect(err) + " url: " + url + " post_body: " + post_body);
-            return callback(err);
-        }
-        if (body.length > 0 && res.statusCode === 200) { // TODO - check the content-type header to see if this is actually JSON
-            try {
-                obj = JSON.parse(body);
-            } catch (json_err) {
-                self.warn("riak post JSON err", body);
-                return callback(new Error("JSON parse error"));
-            }
-            return callback(null, res, obj);
-        } else {
-            self.warn("riak post", url + " non-200 statusCode: " + res.statusCode + ", body: " + body + ", post_body: " + post_body);
-            return callback(null, res, {error: "non-JSON: " + body});
-        }
-        callback(null, res, obj);
-    });
 };
 
 // TODO - this is no longer used, so it might not work anymore.
