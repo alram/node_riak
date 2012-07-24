@@ -279,7 +279,6 @@ RiakRequest.prototype.do_request = function () {
     };
 
     if (this.i2) {
-      //bucket is bucket
       pool_options.path = "/buckets/" + encodeURIComponent(this.bucket) + "/index/" + this.key + qs;
     }
 
